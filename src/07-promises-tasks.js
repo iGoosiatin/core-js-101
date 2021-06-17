@@ -105,16 +105,14 @@ function getFastestPromise(array) {
  */
 function chainPromises(array, action) {
   return array
-    .reduce((accum, item, index) => accum
+    .reduce((accum, item) => accum
       .then((accRes) => {
         if (accRes === '') {
           return item
             .catch(() => accRes);
         }
         return item
-          .then((itemRes) => {
-            return action(accRes, itemRes);
-          })
+          .then((itemRes) => action(accRes, itemRes))
           .catch(() => accRes);
       }), new Promise((resolve) => resolve('')));
 }
