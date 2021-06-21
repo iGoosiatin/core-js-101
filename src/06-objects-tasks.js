@@ -115,54 +115,85 @@ function fromJSON(proto, json) {
  */
 
 const cssSelectorBuilder = {
+  order: ['tag', 'id', 'class', 'attr', 'pclass', 'pelement'],
+  currentOrder: 0,
+  singleErrMsg: 'Element, id and pseudo-element should not occur more then one time inside the selector',
+  orderErrMsg: 'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element',
+
   element(value) {
-    this.bTag = value;
-    return this;
+    if (this.bTag) throw new Error(this.singleErrMsg);
+    if (this.currentOrder > this.order.indexOf('tag')) throw new Error(this.orderErrMsg);
+    const builder = Object.assign(Object.create(cssSelectorBuilder), this);
+    builder.bTag = value;
+    builder.currentOrder = this.order.indexOf('tag');
+    return builder;
   },
 
   id(value) {
-    this.bId = `#${value}`;
-    return this;
+    if (this.bId) throw new Error(this.singleErrMsg);
+    if (this.currentOrder > this.order.indexOf('id')) throw new Error(this.orderErrMsg);
+    const builder = Object.assign(Object.create(cssSelectorBuilder), this);
+    builder.bId = `#${value}`;
+    builder.currentOrder = this.order.indexOf('id');
+    return builder;
   },
 
   class(value) {
-    if (this.bClass) {
-      this.bClass += `.${value}`;
+    if (this.currentOrder > this.order.indexOf('class')) throw new Error(this.orderErrMsg);
+    const builder = Object.assign(Object.create(cssSelectorBuilder), this);
+    if (builder.bClass) {
+      builder.bClass += `.${value}`;
     } else {
-      this.bClass = `.${value}`;
+      builder.bClass = `.${value}`;
     }
-    return this;
+    builder.currentOrder = this.order.indexOf('class');
+    return builder;
   },
 
   attr(value) {
-    if (this.bAttr) {
-      this.bAttr += `[${value}]`;
+    if (this.currentOrder > this.order.indexOf('attr')) throw new Error(this.orderErrMsg);
+    const builder = Object.assign(Object.create(cssSelectorBuilder), this);
+    if (builder.bAttr) {
+      builder.bAttr += `[${value}]`;
     } else {
-      this.bAttr = `[${value}]`;
+      builder.bAttr = `[${value}]`;
     }
-    return this;
+    builder.currentOrder = this.order.indexOf('attr');
+    return builder;
   },
 
   pseudoClass(value) {
-    if (this.bPseudoClass) {
-      this.bPseudoClass += `:${value}`;
+    if (this.currentOrder > this.order.indexOf('pclass')) throw new Error(this.orderErrMsg);
+    const builder = Object.assign(Object.create(cssSelectorBuilder), this);
+    if (builder.bPseudoClass) {
+      builder.bPseudoClass += `:${value}`;
     } else {
-      this.bPseudoClass = `:${value}`;
+      builder.bPseudoClass = `:${value}`;
     }
-    return this;
+    builder.currentOrder = this.order.indexOf('pclass');
+    return builder;
   },
 
   pseudoElement(value) {
-    this.bPseudoElem = `::${value}`;
-    return this;
+    if (this.bPseudoElem) throw new Error(this.singleErrMsg);
+    const builder = Object.assign(Object.create(cssSelectorBuilder), this);
+    builder.bPseudoElem = `::${value}`;
+    builder.currentOrder = this.order.indexOf('pelement');
+    return builder;
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    this.bCombination = `${selector1.stringify()} ${combinator} ${selector2.stringify()}`;
+    return this;
   },
 
   stringify() {
     let result = '';
+    if (this.bCombination) {
+      result = this.bCombination;
+      this.clear();
+      return result;
+    }
     if (this.bTag) result += this.bTag;
     if (this.bId) result += this.bId;
     if (this.bClass) result += this.bClass;
@@ -180,6 +211,8 @@ const cssSelectorBuilder = {
     this.bAttr = '';
     this.bPseudoClass = '';
     this.bPseudoElem = '';
+    this.bCombination = '';
+    this.currentOrder = 0;
   },
 };
 
