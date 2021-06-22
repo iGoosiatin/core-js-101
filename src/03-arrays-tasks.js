@@ -103,7 +103,7 @@ function getArrayOfStrings(arr) {
  *    [ false, 0, NaN, '', undefined ]   => [ ]
  */
 function removeFalsyValues(arr) {
-  return arr.filter((item) => item);
+  return arr.filter(Boolean);
 }
 
 /**
@@ -236,7 +236,11 @@ function toArrayOfSquares(arr) {
  *   [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ] => [ 1, 3, 6, 10, 15, 21, 28, 36, 45, 55 ]
  */
 function getMovingSum(arr) {
-  return arr.map((item, index, array) => array.slice(0, index + 1).reduce((sum, i) => sum + i), 0);
+  let sum = 0;
+  return arr.map((item) => {
+    sum += item;
+    return sum;
+  });
 }
 
 /**
@@ -288,7 +292,7 @@ function propagateItemsByPositionIndex(arr) {
  *   [ 10, 10, 10, 10 ] => [ 10, 10, 10 ]
  */
 function get3TopItems(arr) {
-  return arr.sort((a, b) => b - a).splice(0, 3);
+  return arr.sort((a, b) => b - a).slice(0, 3);
 }
 
 
@@ -306,7 +310,10 @@ function get3TopItems(arr) {
  *   [ 1, '2' ] => 1
  */
 function getPositivesCount(arr) {
-  return arr.filter((item) => (typeof item === 'number' ? item > 0 : false)).length;
+  return arr.reduce((count, item) => {
+    if (typeof item === 'number' && item > 0) return count + 1;
+    return count;
+  }, 0);
 }
 
 /**
@@ -368,7 +375,7 @@ function getItemsSum(arr) {
  *  [ null, undefined, NaN, false, 0, '' ]  => 6
  */
 function getFalsyValuesCount(arr) {
-  return arr.filter((item) => !item).length;
+  return arr.reduce((count, item) => (item ? count : count + 1), 0);
 }
 
 /**
@@ -386,7 +393,7 @@ function getFalsyValuesCount(arr) {
  *    [ true, 0, 1, 'true' ], true => 1
  */
 function findAllOccurences(arr, item) {
-  return arr.filter((i) => i === item).length;
+  return arr.reduce((count, i) => (i === item ? count + 1 : count), 0);
 }
 
 /**

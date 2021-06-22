@@ -217,9 +217,7 @@ function getRectangleString(width, height) {
   // Print middle
   for (let i = 0; i < height - 2; i += 1) {
     rect += '│';
-    for (let j = 0; j < width - 2; j += 1) {
-      rect += ' ';
-    }
+    rect += ' '.repeat(width - 2);
     rect += '│\n';
   }
 

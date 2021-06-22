@@ -128,7 +128,7 @@ function getAngleBetweenVectors(x1, y1, x2, y2) {
  *     0     => 0
  */
 function getLastDigit(value) {
-  return +value.toString().slice(-1);
+  return value % 10;
 }
 
 
@@ -144,7 +144,7 @@ function getLastDigit(value) {
  * '-525.5'     => -525.5
  */
 function parseNumberFromString(value) {
-  return +value;
+  return parseFloat(value);
 }
 
 /**
@@ -232,7 +232,7 @@ function isPrime(n) {
  *   toNumber(new Number(42), 0) => 42
  */
 function toNumber(value, def) {
-  return Number(value) || def;
+  return parseFloat(value) || def;
 }
 
 module.exports = {
